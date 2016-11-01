@@ -1,7 +1,5 @@
 package com.alaindroid.parser.byteparser.parser;
 
-import com.alaindroid.parser.byteparser.enums.UnitType;
-
 public class ParseResult {
 
 	private boolean valid;

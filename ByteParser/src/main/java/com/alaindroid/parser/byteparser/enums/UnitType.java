@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import javax.xml.bind.DatatypeConverter;
 
 public enum UnitType {
+	FIXED(p -> true, f -> new String(f)), // fixed
 	STRING(p -> true, f -> new String(f)), // any string
 	LETTER(p -> (p.byteValue() >= 'a' && p.byteValue() <= 'z') || (p.byteValue() >= 'A' && p.byteValue() <= 'Z'),
 			f -> new String(f)), // a-zA-Z

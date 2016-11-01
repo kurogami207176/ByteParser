@@ -1,25 +1,35 @@
 package com.alaindroid.parser.byteparser.parser.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.alaindroid.parser.byteparser.enums.UnitType;
+import com.alaindroid.parser.byteparser.parser.Mappable;
+import com.alaindroid.parser.byteparser.parser.MappableParseResult;
+import com.alaindroid.parser.byteparser.parser.Mapped;
 import com.alaindroid.parser.byteparser.parser.ParseResult;
 import com.alaindroid.parser.byteparser.parser.ParseUnit;
 import com.alaindroid.parser.byteparser.parser.ParseUnitEvaluator;
 
-public class FixedParseUnit implements ParseUnit {
+public class MappedFixedParseUnit implements ParseUnit, Mapped {
+
+	String name;
 
 	String unit;
 	byte[] unitBytes;
+	ByteArrayOutputStream baos;
 
-	public FixedParseUnit(String unit) {
+	// Unit type is always fixed
+	public MappedFixedParseUnit(String name, String unit) {
+		this.name = name;
 		this.unit = unit;
-		this.unitBytes = unit.getBytes();
+		baos = new ByteArrayOutputStream();
 	}
 
 	@Override
 	public String toString() {
-		return "[" + unit + "]";
+		return "(" + name + "|F" + unit + ")";
 	}
 
 	@Override
@@ -46,15 +56,22 @@ public class FixedParseUnit implements ParseUnit {
 	}
 
 	@Override
-	public ParseUnitEvaluator evaluator() {
-		return new FixedParseUnitEvaluator(unitBytes);
+	public String getName() {
+		return name;
 	}
 
-	private static class FixedParseUnitEvaluator implements ParseUnitEvaluator {
-		public FixedParseUnitEvaluator(byte[] unit) {
+	@Override
+	public ParseUnitEvaluator evaluator() {
+		return new MappedFixedParseUnitEvaluator(name, unitBytes);
+	}
+
+	private static class MappedFixedParseUnitEvaluator implements ParseUnitEvaluator, Mappable {
+		public MappedFixedParseUnitEvaluator(String name, byte[] unit) {
 			this.unit = unit;
+			this.name = name;
 		}
 
+		String name;
 		byte[] unit;
 		int counter = 0;
 
@@ -76,6 +93,21 @@ public class FixedParseUnit implements ParseUnit {
 		@Override
 		public byte[] currentValue() {
 			return Arrays.copyOf(unit, counter);
+		}
+
+		@Override
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public byte[] getValue() {
+			return currentValue();
+		}
+
+		@Override
+		public Object getParsedValue() {
+			return UnitType.FIXED.transform(getValue());
 		}
 
 	}
