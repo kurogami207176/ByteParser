@@ -4,17 +4,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.alaindroid.parser.byteparser.parser.ByteParserEvaluator;
 import com.alaindroid.parser.byteparser.parser.Mappable;
 import com.alaindroid.parser.byteparser.parser.ParseUnitEvaluator;
 import com.alaindroid.parser.byteparser.util.Util;
 
-public class ByteParserEvaluator {
+public class UnitByteParserEvaluator implements ByteParserEvaluator{
 
 	List<ParseUnitEvaluator> evaluators;
 	int ctr = 0;
 	ParseUnitEvaluator currentEvaluator;
 
-	protected ByteParserEvaluator(List<ParseUnitEvaluator> evaluators) {
+	protected UnitByteParserEvaluator(List<ParseUnitEvaluator> evaluators) {
 		this.evaluators = evaluators;
 		this.ctr = 0;
 		updateEvaluator();
@@ -24,6 +25,12 @@ public class ByteParserEvaluator {
 		currentEvaluator = evaluators.get(ctr);
 	}
 
+	@Override
+	public boolean isTerminated() {
+		return ctr >= evaluators.size() || (ctr == evaluators.size() - 1 && currentEvaluator.isTerminated((byte) 0));
+	}
+	
+	@Override
 	public boolean isValid(byte b) {
 		if (currentEvaluator.isTerminated(b)) {
 			ctr++;
@@ -32,6 +39,7 @@ public class ByteParserEvaluator {
 		return currentEvaluator.isValid(b);
 	}
 
+	@Override
 	public Map<String, Object> map() throws Exception {
 		Map<String, Object> valueMap = new TreeMap<String, Object>();
 		for (ParseUnitEvaluator parseUnitEvaluator : evaluators) {

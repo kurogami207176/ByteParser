@@ -8,13 +8,15 @@ import java.util.TreeMap;
 
 import javax.xml.bind.DatatypeConverter;
 
+import com.alaindroid.parser.byteparser.parser.ByteParser;
+import com.alaindroid.parser.byteparser.parser.ByteParserEvaluator;
 import com.alaindroid.parser.byteparser.parser.Mappable;
 import com.alaindroid.parser.byteparser.parser.ParseResult;
 import com.alaindroid.parser.byteparser.parser.ParseUnit;
 import com.alaindroid.parser.byteparser.parser.ParseUnitEvaluator;
 import com.alaindroid.parser.byteparser.util.Util;
 
-public class ByteParser {
+public class UnitByteParser implements ByteParser {
 	// Sample inputs
 	// #RSP,%string|IMEI%,%integer|SOMETHING%$
 
@@ -22,7 +24,7 @@ public class ByteParser {
 	private List<ParseUnit> parseUnits;
 	private Set<String> keys;
 
-	public ByteParser(String loaded) {
+	public UnitByteParser(String loaded) {
 		this.loaded = loaded;
 		parseUnits = Util.load(this.loaded);
 		keys = Util.getKeys(parseUnits);
@@ -64,7 +66,7 @@ public class ByteParser {
 	}
 
 	public ByteParserEvaluator getEvaluator() {
-		return new ByteParserEvaluator(getEvaluators());
+		return new UnitByteParserEvaluator(getEvaluators());
 	}
 
 	private List<ParseUnitEvaluator> getEvaluators() {
@@ -78,47 +80,6 @@ public class ByteParser {
 	public void printParseUnits() {
 		for (ParseUnit unit : parseUnits) {
 			System.out.println(unit);
-		}
-	}
-
-	public static void main(String[] args) {
-		String loadable = "#RSP,%string|IMEI%,%integer|SOMETHING%$";
-		String toEvaluate = "#RSP,0011232,123$";
-		System.out.println(toEvaluate.length());
-		System.out.println(toEvaluate.getBytes().length);
-
-		ByteParser parser = new ByteParser(loadable);
-		// byte array
-		parser.printParseUnits();
-		Map<String, Object> map;
-		try {
-			map = parser.map(toEvaluate.getBytes());
-			System.out.println("Parser.map");
-			for (String key : map.keySet()) {
-				Object value = map.get(key);
-				System.out.println("key=" + key);
-				System.out.println("value=" + (value == null ? "NULL" : value.toString()));
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// byte by byte
-		ByteParserEvaluator evaluator = parser.getEvaluator();
-		for (byte b : toEvaluate.getBytes()) {
-			boolean isValid = evaluator.isValid(b);
-		}
-		System.out.println("ParserEvaluator.map");
-		try {
-			map = evaluator.map();
-			System.out.println("Parser.map");
-			for (String key : map.keySet()) {
-				Object value = map.get(key);
-				System.out.println("key=" + key);
-				System.out.println("value=" + (value == null ? "NULL" : value.toString()));
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 	}
 
