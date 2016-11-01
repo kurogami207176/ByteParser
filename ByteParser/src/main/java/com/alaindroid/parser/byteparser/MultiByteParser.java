@@ -29,12 +29,12 @@ public class MultiByteParser implements ByteParser {
 		Map<String, Object> retVal = null;
 		for (UnitByteParser parser : bunch) {
 			try {
+				Map<String, Object> temp = parser.map(bytes);
 				if (retVal != null) {
 					throw new Exception("Too many evaluations possible!");
 				}
-				retVal = parser.map(bytes);
+				retVal = temp;
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
 		if (retVal == null) {

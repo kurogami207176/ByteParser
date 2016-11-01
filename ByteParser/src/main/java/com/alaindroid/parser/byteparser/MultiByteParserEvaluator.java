@@ -29,10 +29,21 @@ public class MultiByteParserEvaluator implements ByteParserEvaluator {
 	}
 
 	public Map<String, Object> map() throws Exception {
-		if (evaluators.size() != 1) {
-			throw new Exception("Too many evaluations possible!");
+		Map<String, Object> retVal = null;
+		for (ByteParserEvaluator eval : evaluators) {
+			try {
+				Map<String, Object> temp = eval.map();
+				if (retVal != null) {
+					throw new Exception("Too many evaluations possible!");
+				}
+				retVal = temp;
+			} catch (Exception e) {
+			}
 		}
-		return evaluators.get(0).map();
+		if (retVal == null) {
+			throw new Exception("Unable to evaluate!");
+		}
+		return retVal;
 	}
 
 	@Override
