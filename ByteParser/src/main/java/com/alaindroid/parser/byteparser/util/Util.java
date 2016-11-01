@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.xml.bind.DatatypeConverter;
+
 import com.alaindroid.parser.byteparser.parser.Mapped;
 import com.alaindroid.parser.byteparser.parser.Parametered;
 import com.alaindroid.parser.byteparser.parser.ParseUnit;
@@ -94,6 +96,10 @@ public class Util {
 			}
 		}
 		return name;
+	}
+
+	public static String printBytes(byte[] bytes) {
+		return DatatypeConverter.printHexBinary(bytes) + "(" + new String(bytes) + ")";
 	}
 
 }

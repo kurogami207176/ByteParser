@@ -4,4 +4,6 @@ public interface ParseUnitEvaluator {
 	public boolean isValid(byte b);
 
 	public boolean isTerminated(byte b);
+	
+	public byte[] currentValue();
 }

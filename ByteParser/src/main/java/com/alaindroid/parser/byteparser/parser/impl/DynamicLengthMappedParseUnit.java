@@ -13,6 +13,7 @@ import com.alaindroid.parser.byteparser.parser.Mapped;
 import com.alaindroid.parser.byteparser.parser.ParseResult;
 import com.alaindroid.parser.byteparser.parser.ParseUnit;
 import com.alaindroid.parser.byteparser.parser.ParseUnitEvaluator;
+import com.alaindroid.parser.byteparser.util.Util;
 
 public class DynamicLengthMappedParseUnit implements ParseUnit, Mapped {
 	String name;
@@ -91,8 +92,8 @@ public class DynamicLengthMappedParseUnit implements ParseUnit, Mapped {
 			try {
 				len = Integer.parseInt(new String(bytes));
 			} catch (Exception e) {
-				throw new InvalidParameterException("Invalid length value " + (bytes == null ? "null"
-						: (DatatypeConverter.printHexBinary(bytes) + "(" + new String(bytes) + ")")));
+				throw new InvalidParameterException(
+						"Invalid length value " + (bytes == null ? "null" : Util.printBytes(bytes)));
 
 			}
 
@@ -123,6 +124,11 @@ public class DynamicLengthMappedParseUnit implements ParseUnit, Mapped {
 		@Override
 		public Object getParsedValue() {
 			return type.transform(getValue());
+		}
+
+		@Override
+		public byte[] currentValue() {
+			return baos.toByteArray();
 		}
 
 	}

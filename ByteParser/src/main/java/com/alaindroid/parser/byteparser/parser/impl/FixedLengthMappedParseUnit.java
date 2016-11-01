@@ -102,6 +102,11 @@ public class FixedLengthMappedParseUnit implements ParseUnit, Mapped {
 			return type.transform(getValue());
 		}
 
+		@Override
+		public byte[] currentValue() {
+			return baos.toByteArray();
+		}
+
 	}
 
 }

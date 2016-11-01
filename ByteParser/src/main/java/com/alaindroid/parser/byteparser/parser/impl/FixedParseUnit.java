@@ -1,5 +1,6 @@
 package com.alaindroid.parser.byteparser.parser.impl;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import com.alaindroid.parser.byteparser.parser.ParseResult;
@@ -81,6 +82,11 @@ public class FixedParseUnit implements ParseUnit {
 		@Override
 		public boolean isTerminated(byte b) {
 			return counter >= unit.length;
+		}
+
+		@Override
+		public byte[] currentValue() {
+			return Arrays.copyOf(unit, counter);
 		}
 
 	}

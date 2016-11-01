@@ -44,30 +44,39 @@ public class TerminatedMappedParseUnit implements ParseUnit, Mapped {
 
 	@Override
 	public ParseResult validate(byte[] b, Map<String, Object> prop) {
-		int terminatorIndex = -1;
-		for (int i = 0; i < b.length; i++) {
-			if (b[i] == terminator) {
-				terminatorIndex = i;
-				break;
-			}
-		}
-		if (terminatorIndex > 0) {
-			byte[] value = new byte[terminatorIndex];
-			System.arraycopy(b, 0, value, 0, terminatorIndex);
-			for (byte v : value) {
+		if (terminator == 0) {
+			for (byte v : b) {
 				if (!type.isValid(v)) {
 					return ParseResult.invalid(b);
 				}
 			}
-			int restLen = b.length - terminatorIndex;
-			if (restLen > 0) {
-				byte[] rest = new byte[restLen];
-				if (terminatorIndex < b.length) {
-					System.arraycopy(b, terminatorIndex, rest, 0, rest.length);
+			return new MappableParseResult(true, new byte[] {}, type, name, b);
+		} else {
+			int terminatorIndex = -1;
+			for (int i = 0; i < b.length; i++) {
+				if (b[i] == terminator) {
+					terminatorIndex = i;
+					break;
 				}
-				return new MappableParseResult(true, rest, type, name, value);
-			} else {
-				return new MappableParseResult(true, new byte[] {}, type, name, value);
+			}
+			if (terminatorIndex > 0) {
+				byte[] value = new byte[terminatorIndex];
+				System.arraycopy(b, 0, value, 0, terminatorIndex);
+				for (byte v : value) {
+					if (!type.isValid(v)) {
+						return ParseResult.invalid(b);
+					}
+				}
+				int restLen = b.length - terminatorIndex;
+				if (restLen > 0) {
+					byte[] rest = new byte[restLen];
+					if (terminatorIndex < b.length) {
+						System.arraycopy(b, terminatorIndex, rest, 0, rest.length);
+					}
+					return new MappableParseResult(true, rest, type, name, value);
+				} else {
+					return new MappableParseResult(true, new byte[] {}, type, name, value);
+				}
 			}
 		}
 		return ParseResult.invalid(b);
@@ -93,6 +102,7 @@ public class TerminatedMappedParseUnit implements ParseUnit, Mapped {
 		String name;
 		int terminator;
 		UnitType type;
+		boolean terminated;
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		@Override
@@ -103,7 +113,10 @@ public class TerminatedMappedParseUnit implements ParseUnit, Mapped {
 
 		@Override
 		public boolean isTerminated(byte b) {
-			return b == terminator;
+			if (!terminated) {
+				terminated = b == terminator;
+			}
+			return terminated;
 		}
 
 		@Override
@@ -119,6 +132,11 @@ public class TerminatedMappedParseUnit implements ParseUnit, Mapped {
 		@Override
 		public Object getParsedValue() {
 			return type.transform(getValue());
+		}
+
+		@Override
+		public byte[] currentValue() {
+			return baos.toByteArray();
 		}
 
 	}
