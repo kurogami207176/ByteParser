@@ -8,12 +8,14 @@ import java.util.TreeSet;
 
 import javax.xml.bind.DatatypeConverter;
 
+import com.alaindroid.parser.byteparser.enums.UnitType;
 import com.alaindroid.parser.byteparser.parser.Mapped;
 import com.alaindroid.parser.byteparser.parser.Parametered;
 import com.alaindroid.parser.byteparser.parser.ParseUnit;
 import com.alaindroid.parser.byteparser.parser.impl.DynamicLengthMappedParseUnit;
 import com.alaindroid.parser.byteparser.parser.impl.FixedLengthMappedParseUnit;
 import com.alaindroid.parser.byteparser.parser.impl.FixedParseUnit;
+import com.alaindroid.parser.byteparser.parser.impl.MappedFixedParseUnit;
 import com.alaindroid.parser.byteparser.parser.impl.MappedUnitType;
 import com.alaindroid.parser.byteparser.parser.impl.TerminatedMappedParseUnit;
 
@@ -41,8 +43,14 @@ public class Util {
 					ParseUnit unit = new FixedLengthMappedParseUnit(nameString, type.getType(), len);
 					retVal.add(unit);
 				} catch (NumberFormatException nfe) {
-					ParseUnit unit = new DynamicLengthMappedParseUnit(nameString, type.getType(), parameter);
-					retVal.add(unit);
+					UnitType ty = type.getType();
+					if (ty == UnitType.FIXED) {
+						ParseUnit unit = new MappedFixedParseUnit(nameString, parameter);
+						retVal.add(unit);
+					} else {
+						ParseUnit unit = new DynamicLengthMappedParseUnit(nameString, ty, parameter);
+						retVal.add(unit);
+					}
 				}
 				if (rest != null && rest.length() > 0) {
 					List<ParseUnit> restUnits = load(rest);
@@ -67,7 +75,9 @@ public class Util {
 			}
 		}
 		// has mappable next
-		else if (specIndex > 0 && pipeIndex > specIndex && endSpecIndex > pipeIndex) {
+		else if (specIndex > 0 && pipeIndex > specIndex && endSpecIndex > pipeIndex)
+
+		{
 			String fixedString = load.substring(0, specIndex);
 			String rest = load.substring(specIndex);
 			ParseUnit unit = new FixedParseUnit(fixedString);

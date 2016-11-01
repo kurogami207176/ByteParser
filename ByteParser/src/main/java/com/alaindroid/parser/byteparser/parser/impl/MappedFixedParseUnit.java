@@ -11,6 +11,7 @@ import com.alaindroid.parser.byteparser.parser.Mapped;
 import com.alaindroid.parser.byteparser.parser.ParseResult;
 import com.alaindroid.parser.byteparser.parser.ParseUnit;
 import com.alaindroid.parser.byteparser.parser.ParseUnitEvaluator;
+import com.alaindroid.parser.byteparser.util.Util;
 
 public class MappedFixedParseUnit implements ParseUnit, Mapped {
 
@@ -24,6 +25,7 @@ public class MappedFixedParseUnit implements ParseUnit, Mapped {
 	public MappedFixedParseUnit(String name, String unit) {
 		this.name = name;
 		this.unit = unit;
+		this.unitBytes = unit.getBytes();
 		baos = new ByteArrayOutputStream();
 	}
 
@@ -49,7 +51,7 @@ public class MappedFixedParseUnit implements ParseUnit, Mapped {
 			} else {
 				rest = new byte[] {};
 			}
-			return new ParseResult(true, rest);
+			return new MappableParseResult(true, rest, UnitType.FIXED, name, unitBytes);
 
 		}
 		return ParseResult.invalid(b);
